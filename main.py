@@ -1,15 +1,16 @@
 from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 import numpy as np
-import pickle
+# import pickle
 import requests
+import dill
 
 
 
 app = FastAPI()
 
-new_df= pickle.load(open('pickle/new_df.pkl','rb'))
-similarity_scores = pickle.load(open('pickle/similarity_scores.pkl','rb'))
+new_df= dill.load(open('pickle/new_df.pkl','rb'))
+similarity_scores = dill.load(open('pickle/similarity_scores.pkl','rb'))
 
 templates = Jinja2Templates(directory='templates')
 
@@ -22,17 +23,17 @@ def fetch_poster(movie_id):
     return poster_path
 
 @app.get('/')
-def popular(request:Request):
+async def popular(request:Request):
     return templates.TemplateResponse('popular.html',{'request':request ,'name':'popular'})
 
 @app.get('/recommend')
-def recommend(request:Request):
+async def recommend(request:Request):
     return templates.TemplateResponse(
         'recommend.html',{'request':request,'name':'Recommend'},
         )
 
 @app.post('/recommend_movies')
-def recommend_movie(request:Request,user_input:str = Form(...)):
+async def recommend_movie(request:Request,user_input:str = Form(...)):
     # movie = request.get('user_input') does not work
     index = np.where(new_df['title']==user_input)
     score = similarity_scores[index][0]

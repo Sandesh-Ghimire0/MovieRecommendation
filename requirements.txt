@@ -5,3 +5,6 @@ uvicorn
 jinja2
 python-multipart
 requests
+dill
+nltk
+scikit-learn
